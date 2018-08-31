@@ -4,26 +4,33 @@ clc
 
 % Initialization
 
-lambda=10.6; %microns
+lambda=10.6;    %microns
 
-theta=60*pi/180;  % SNOM incidence angle
+theta=60*pi/180;    % SNOM incidence angle
 
-Vrms=0.106; % Volts
+Vrms=0.106;     % Volts
 
 % MaxTau=50.4179; % Good diodes: From 2017-11-21_diode_h_5_PH_X_3
 % MaxTau=26.2718; % Bad diodes diodes: From 2017-12-12_diode_g_2_PH_X_2
 MaxTau=1;
-% MaxTau=1;
 
-run=1;
+run=0;  % run=0 stops after topography
+        % run=1 continues after topography
 
+savefigs=1; % savefigs=0 do not save images
+            % savefigs=1 save images
+            
+savevid=1;  % savefigs=0 do not save video
+            % savefigs=1 save video
+        
 %% LOAD
     
-load 2018-04-07_leaky_E_4_V_PH_X_1
+load 2018-04-26_bowtie_1_LP_90_PH_X_1
 
 dir1='Presentation';
-dir2='2018-04-07';
-dir3='Leaky_E4_V_1';
+dir2='2018-04-26';
+dir3='bowtie_1_LP_90_1';
+% dir3='Leaky_E_4_V_RHCP_X_5\corr_subst';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
 dir=strcat(dir1,'\',dir4);
@@ -44,7 +51,7 @@ N=N(1);
 
 MinTopo=min(min(TopoX));
 MaxTopo=max(max(TopoX));
-thrX=0.40*(MaxTopo-MinTopo)+MinTopo;
+thrX=0.11*(MaxTopo-MinTopo)+MinTopo;
 
 StrucInd=find(TopoX>thrX);
 SubstInd=find(TopoX<thrX);
@@ -55,8 +62,17 @@ MaskX=zeros(N,N);
 MaskX(StrucInd)=1;
 MaskX(SubstInd)=0;
 
-% MaskX(1:12,:)=0;
-% MaskX(:,1:16)=0;
+% MaskX(1:64,1:20)=0;         % #1
+% MaskX(1:64,48:88)=0;        % #2
+% MaskX(1:64,98:128)=0;      % #3
+% 
+% MaskX(64:128,1:18)=0;       % #4
+% MaskX(64:128,48:88)=0;      % #5
+% MaskX(64:128,98:128)=0;    % #6
+% 
+% MaskX(1:16,:)=0;            % #7
+% MaskX(61:80,:)=0;           % #8
+% MaskX(125:128,:)=0;         % #9
 
 Square=ones(3);
 MaskX=conv2(MaskX,Square,'same');
@@ -65,7 +81,7 @@ StrucInd=find(MaskX>0);
 SubstInd=find(MaskX==0);
 MaskX(StrucInd)=1;
 
-    F1=figure('units','normalized','outerposition',[0 0 1 1]);
+    F1=figure();
 
     % X component
 
@@ -91,7 +107,10 @@ MaskX(StrucInd)=1;
     xlabel('x (\mum)')
     ylabel('y (\mum)')
     daspect([1 1 1])
-    saveas(F1,strcat(dir,'\','1.Topography.png'))
+    pause(0.00001);
+    frame_h = get(handle(gcf),'JavaFrame');
+    set(frame_h,'Maximized',1);
+
 
 if run==1
 
@@ -153,7 +172,9 @@ if run==1
         xlabel('x (\mum)')
         ylabel('y (\mum)')
         daspect([1 1 1])
-        saveas(F2,strcat(dir,'\','2.SideBands.png'))
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
 
     %% NEAR FIELD
 
@@ -170,19 +191,21 @@ if run==1
     C1=1/J1;
     C2=1/J2;
 
-    Vrms=(2.63*lambda/(4*pi))*scale/(sqrt(2))
+    Vrms=(2.63*lambda/(4*pi))*scale/(sqrt(2));
 
     Tau=C2*SideB2-1i*C1*SideB1;
 
     ModulTau=abs(Tau)./MaxTau;
     % MaxTau=max(max(ModulTau))
     % ModulTau(ModulTau>60)=0;
-    PhaseTau=atan2(imag(Tau),real(Tau));
+    PhaseTau=atan2(-imag(Tau),real(Tau));
 
     Y=ones(My,Mx);
     for ii=1:1:Mx
        Y(:,ii)=y; 
     end
+    Y=flipud(Y);
+    
     PhaseCorr=PhaseTau-(2*pi/lambda)*Y*sin(theta);
     PhaseCorrW=wrapToPi(PhaseCorr);
 
@@ -215,8 +238,10 @@ if run==1
         xlabel('x (\mum)')
         ylabel('y (\mum)')
         daspect([1 1 1])
-        saveas(F31,strcat(dir,'\','3.Ez_vs_Phase.png'))
-
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
+        
         % Plot 2: Ez vs E Phase (Corrected)
 
         F32=figure('units','normalized','outerposition',[0 0 1 1]);
@@ -242,7 +267,9 @@ if run==1
         xlabel('x (\mum)')
         ylabel('y (\mum)')
         daspect([1 1 1])
-        saveas(F32,strcat(dir,'\','4.Ez_vs_PhaseCorr.png'))
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
 
         % Plot 3: Re{Ez} vs E Phase (Corrected)
 
@@ -272,7 +299,9 @@ if run==1
         xlabel('x (\mum)')
         ylabel('y (\mum)')
         daspect([1 1 1])
-        saveas(F33,strcat(dir,'\','5.ReEz_vs_PhaseCorr.png'))
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
 
         % Plot 4: Ez vs Re{E}
 
@@ -298,7 +327,9 @@ if run==1
         xlabel('x (\mum)')
         ylabel('y (\mum)');
         daspect([1 1 1])
-        saveas(F34,strcat(dir,'\','6.Ez_vs_ReEz.png'))
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
 
         % Plot 5: E Phase vs E Phase (Correcred)
 
@@ -326,7 +357,9 @@ if run==1
         xlabel('x (\mum)')
         ylabel('y (\mum)')
         daspect([1 1 1])
-        saveas(F35,strcat(dir,'\','7.Phase_vs_PhaseCorr.png'))
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
 
     %% NEAR FIELD IN COMPLEX PLANE VISUALIZATION - NON ROTATED
     
@@ -423,18 +456,10 @@ if run==1
             title(Title)
         %     set(gca,'FontSize',fst);
             drawnow
-            PhaseMovie(jj)=getframe;
-        %     pause(0.01)
+            PhaseMovie(jj)=getframe(gcf);
+            pause(0.01)
 
         end
-
-        % Save video
-
-        v=VideoWriter(strcat(dir,'\','8.Phase_Evol.avi'));
-        v.FrameRate=10;
-        open(v);
-        writeVideo(v,PhaseMovie);
-        close(v);
 
     %% Histogram
 
@@ -458,4 +483,23 @@ if run==1
         % axis square
         % xlabel('Signal')
         % ylabel('Ocurrences');
+        
+    %% Save Figures
+    if savefigs==1
+        saveas(F1,strcat(dir,'\','1.Topography.png'))
+        saveas(F2,strcat(dir,'\','2.SideBands.png'))
+        saveas(F31,strcat(dir,'\','3.Ez_vs_Phase.png'))
+        saveas(F32,strcat(dir,'\','4.Ez_vs_PhaseCorr.png'))
+        saveas(F33,strcat(dir,'\','5.ReEz_vs_PhaseCorr.png'))
+        saveas(F34,strcat(dir,'\','6.Ez_vs_ReEz.png'))
+        saveas(F35,strcat(dir,'\','7.Phase_vs_PhaseCorr.png'))
+    end
+    %% Save phase video evolution
+    if savevid==1
+        v=VideoWriter(strcat(dir,'\','8.Phase_Evol.avi'));
+        v.FrameRate=10;
+        open(v);
+        writeVideo(v,PhaseMovie);
+        close(v);
+    end
 end
