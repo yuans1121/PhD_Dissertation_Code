@@ -1,0 +1,127 @@
+clear all
+close all
+clc
+
+% Initialization
+
+lambda=10.6;    %microns
+
+theta=60*pi/180;    % SNOM incidence angle
+
+Vrms=0.106;     % Volts
+
+%% LOAD
+    
+load 2018-09-25_lift_squares_PH
+
+dir1='Presentation';
+dir2='2018-09-25';
+dir3='lift_squares_PH';
+dir4=strcat(dir2,'\',dir3);
+mkdir(dir1,dir4);
+dir=strcat(dir1,'\',dir4);
+
+%% TOPOGRAPHY
+
+x=MSB1(:,2,1);
+n=size(x);  n=n(1);
+
+TopoFwrd=MSB1(:,5,1);
+TopoBwrd=MSB1(:,5,6);
+
+
+X=zeros(1,6);
+Y=zeros(1,6);
+
+j=1;
+for i=3:1:n-3
+    if(TopoFwrd(i)<0.25)
+        if(TopoFwrd(i)<TopoFwrd(i-2) && TopoFwrd(i)<TopoFwrd(i+2))
+            X(j)=x(i);
+            Y(j)=TopoFwrd(i);
+            j=j+1;
+        end
+    end
+end
+
+X=X-X(1);
+Y=Y-Y(1);
+theta=atan(Y./X);
+thetadeg=theta*180/pi;
+
+theta=mean(theta(2:6));
+
+TopoFwrdcorr=TopoFwrd-x*tan(theta);
+TopoBwrdcorr=TopoBwrd-x*tan(theta);
+
+thr=0.22;
+
+StrucInd=find(TopoFwrdcorr>thr);
+SubstInd=find(TopoBwrdcorr<thr);
+
+Mask=zeros(n,1);
+Mask(StrucInd)=1;
+Mask(SubstInd)=0;
+
+% diff=mean(abs(TopoFwrdcorr-TopoBwrdcorr));
+
+%% ANALYSIS
+
+SideB1=MSB1(:,4,1);
+SideB2=MSB2(:,4,1);
+
+% Gamma calculation
+
+V=sqrt(2)*Vrms;
+scale=0.2218;
+DeltaL=V/scale;
+gamma=4*pi*DeltaL/lambda;
+
+J1=besselj(1,gamma);
+J2=besselj(2,gamma);
+
+C1=1/J1;
+C2=1/J2;
+
+Vrms=(2.63*lambda/(4*pi))*scale/(sqrt(2));
+
+Tau=C2*SideB2-1i*C1*SideB1;
+    
+MaxTau=max(abs(Tau));
+ModulTau=abs(Tau);
+ModulTauNorm=abs(Tau)/MaxTau;
+    
+PhaseTau=atan2(-imag(Tau),real(Tau));
+PhaseTauMask=PhaseTau.*Mask;
+    
+%% PLOTS
+
+fig1=figure('units','normalized','outerposition',[0 0 1 1]);
+    subplot(1,2,1);
+    plot(x,TopoFwrdcorr,x,TopoBwrdcorr)
+    title('Topography')
+    axis square
+    xlabel('x (\mum)')
+    ylabel('z (\mum)');
+
+    subplot(1,2,2);
+    plot(x,Mask)
+    title('Mask')
+    axis square
+    xlabel('x (\mum)')
+    ylabel('z (\mum)');
+        
+fig2=figure('units','normalized','outerposition',[0 0 1 1]);
+    subplot(1,2,1);
+    plot(x,ModulTau,x,Mask)
+    title('Modulus')
+    axis square
+    xlabel('x (\mum)')
+    ylabel('z (\mum)');
+        
+    subplot(1,2,2);
+    plot(x,PhaseTauMask,x,Mask)
+    title('Phase')
+    axis square
+    xlabel('x (\mum)')
+    ylabel('z (\mum)');
