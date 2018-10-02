@@ -173,7 +173,7 @@ Fig3=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig22=subplot(2,1,2);
     plot(x,TopoFwrdcorr)
     title('Topography')
-    xlim([0 15])
+    xlim([0 10])
     xlabel('x (\mum)')
     ylabel('z (\mum)');
     pause(0.00001);
@@ -193,7 +193,7 @@ Fig4=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig22=subplot(2,1,2);
     plot(x,TopoFwrdcorr)
     title('Topography')
-    xlim([0 15])
+    xlim([0 10])
     xlabel('x (\mum)')
     ylabel('z (\mum)');
     pause(0.00001);
