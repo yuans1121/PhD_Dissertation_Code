@@ -13,7 +13,7 @@ Vrms=0.106;     % Volts
 % MaxTau=50.4179; % Good diodes: From 2017-11-21_diode_h_5_PH_X_3
 % MaxTau=26.2718; % Bad diodes diodes: From 2017-12-12_diode_g_2_PH_X_2
 
-run=1;  % run=0 stops after topography
+run=0;  % run=0 stops after topography
         % run=1 continues after topography
 
 savefigs=0; % savefigs=0 do not save images
@@ -22,14 +22,18 @@ savefigs=0; % savefigs=0 do not save images
 savevid=0;  % savefigs=0 do not save video
             % savefigs=1 save video
         
+saveMATLABfig=0;    % saveMATLABfig=0 do not save figure in matlab format
+                    % saveMATLABfig=0 save figure in matlab format
+                    
 %% LOAD
     
-load 2018-05-11_discrete_bowtie_LP_150_PH_X_3
+load 2018-04-17_leaky_E4_RHCP_PH_X_5
 
 dir1='Presentation';
-dir2='2018-05-11';
+dir2='2018-04-17';
 % dir3='bowtie_1_LP_150_3';
-dir3='discrete_bowtie_LP_150_3';
+% dir3='discrete_bowtie_LP_150_3';
+dir3='Leaky_E4_RHCP_5';
 % dir3='Leaky_E_4_V_RHCP_X_5\corr_subst';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
@@ -51,7 +55,7 @@ N=N(1);
 
 MinTopo=min(min(TopoX));
 MaxTopo=max(max(TopoX));
-thrX=0.14*(MaxTopo-MinTopo)+MinTopo;
+thrX=0.20*(MaxTopo-MinTopo)+MinTopo;
 
 StrucInd=find(TopoX>thrX);
 SubstInd=find(TopoX<thrX);
@@ -247,8 +251,10 @@ if run==1
 
         F32=figure('units','normalized','outerposition',[0 0 1 1]);
         Fig1=subplot(1,2,1);
-        imagesc(x,y,ModulTauNorm)
-        title('Field Modulus |Ez|/|Ez_{max}|')
+        imagesc(x,y,ModulTau)
+%         imagesc(x,y,ModulTauNorm)
+%         title('Field Modulus |Ez|/|Ez_{max}|')
+        title('|Ez|')
         colormap(Fig1,parula)
         bar=colorbar;
         axis square
@@ -534,5 +540,9 @@ if run==1
         open(v);
         writeVideo(v,PhaseMovie2);
         close(v);
+    end
+    %% Save MATLAB figure
+    if saveMATLABfig==1
+        saveas(F32,strcat(dir,'\','MagEz_Phase.fig'))
     end
 end
