@@ -27,13 +27,13 @@ saveMATLABfig=1;    % saveMATLABfig=0 do not save figure in matlab format
                     
 %% LOAD
     
-load 2018-04-07_leaky_E_4_V_RHCP_X_1
+load 2018-04-17_leaky_E4_LHCP_PH_X_6
 
 dir1='Presentation';
-dir2='2018-04-07';
+dir2='2018-04-17';
 % dir3='bowtie_1_LP_150_3';
 % dir3='discrete_bowtie_LP_150_3';
-dir3='Leaky_E4_RHCP_5';
+dir3='Leaky_E4_LHCP_6';
 % dir3='Leaky_E_4_V_RHCP_X_5\corr_subst';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
@@ -55,7 +55,7 @@ N=N(1);
 
 MinTopo=min(min(TopoX));
 MaxTopo=max(max(TopoX));
-thrX=0.14*(MaxTopo-MinTopo)+MinTopo;
+thrX=0.22*(MaxTopo-MinTopo)+MinTopo;
 
 StrucInd=find(TopoX>thrX);
 SubstInd=find(TopoX<thrX);
