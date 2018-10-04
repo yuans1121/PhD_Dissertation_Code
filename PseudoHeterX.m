@@ -16,24 +16,24 @@ Vrms=0.106;     % Volts
 run=1;  % run=0 stops after topography
         % run=1 continues after topography
 
-savefigs=0; % savefigs=0 do not save images
+savefigs=1; % savefigs=0 do not save images
             % savefigs=1 save images
             
-savevid=0;  % savefigs=0 do not save video
+savevid=1;  % savefigs=0 do not save video
             % savefigs=1 save video
         
-saveMATLABfig=1;    % saveMATLABfig=0 do not save figure in matlab format
+saveMATLABfig=0;    % saveMATLABfig=0 do not save figure in matlab format
                     % saveMATLABfig=0 save figure in matlab format
                     
 %% LOAD
     
-load 2018-04-17_leaky_E4_LHCP_PH_X_11
+load 2018-10-01_leaky_E4_PH_VLP_5
 
 dir1='Presentation';
-dir2='2018-04-17';
+dir2='2018-10-01';
 % dir3='bowtie_1_LP_150_3';
 % dir3='discrete_bowtie_LP_150_3';
-dir3='Leaky_E4_LHCP_11';
+dir3='Leaky_E4_VLP_5';
 % dir3='Leaky_E_4_V_RHCP_X_5\corr_subst';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
@@ -55,7 +55,7 @@ N=N(1);
 
 MinTopo=min(min(TopoX));
 MaxTopo=max(max(TopoX));
-thrX=0.22*(MaxTopo-MinTopo)+MinTopo;
+thrX=0.30*(MaxTopo-MinTopo)+MinTopo;
 
 StrucInd=find(TopoX>thrX);
 SubstInd=find(TopoX<thrX);
@@ -440,59 +440,59 @@ if run==1
 
     %% Phase Evolution
 
-%     % Phase (no correction)
-%     
-%     Nframes=101;
-%     PhaseSpace=linspace(0,2*pi,Nframes);
-%     dt=linspace(0,1,Nframes);
-% 
-%     PhaseMovie1(Nframes)=struct('cdata',[],'colormap',[]);
-% 
-%         F5=figure();
-%         for jj=1:Nframes
-%             PhaseEvol=PhaseTau+ones(N).*PhaseSpace(jj);
-%             Title=strcat('Phase (t=',num2str(dt(jj)),' period)');
-%             WrapPhase=wrapToPi(PhaseEvol.*MaskX);
-%             imagesc(x,y,WrapPhase,[-pi, pi]);
-%         %     imagesc(x,y(1:N/2),WrapPhase(1:N/2,:),[-pi, pi]);
-%         %     imagesc(x,y,rot90(WrapPhase,3),[-pi, pi]);
-%             axis square; axis image; 
-%             colormap(PhaseColormap); colorbar
-%             xlabel('x (\mum)')
-%             ylabel('y (\mum)')
-%         %     daspect([1 1 1])
-%             title(Title)
-%         %     set(gca,'FontSize',fst);
-%             drawnow
-%             PhaseMovie1(jj)=getframe(gcf);
-%             pause(0.01)
-% 
-%         end
-%     
-%     % Phase (correction)
-% 
-%     PhaseMovie2(Nframes)=struct('cdata',[],'colormap',[]);
-% 
-%         F5=figure();
-%         for jj=1:Nframes
-%             PhaseEvol=PhaseCorrW+ones(N).*PhaseSpace(jj);
-%             Title=strcat('Phase (t=',num2str(dt(jj)),' period)');
-%             WrapPhase=wrapToPi(PhaseEvol.*MaskX);
-%             imagesc(x,y,WrapPhase,[-pi, pi]);
-%         %     imagesc(x,y(1:N/2),WrapPhase(1:N/2,:),[-pi, pi]);
-%         %     imagesc(x,y,rot90(WrapPhase,3),[-pi, pi]);
-%             axis square; axis image; 
-%             colormap(PhaseColormap); colorbar
-%             xlabel('x (\mum)')
-%             ylabel('y (\mum)')
-%         %     daspect([1 1 1])
-%             title(Title)
-%         %     set(gca,'FontSize',fst);
-%             drawnow
-%             PhaseMovie2(jj)=getframe(gcf);
-%             pause(0.01)
-% 
-%         end
+    % Phase (no correction)
+    
+    Nframes=101;
+    PhaseSpace=linspace(0,2*pi,Nframes);
+    dt=linspace(0,1,Nframes);
+
+    PhaseMovie1(Nframes)=struct('cdata',[],'colormap',[]);
+
+        F5=figure();
+        for jj=1:Nframes
+            PhaseEvol=PhaseTau+ones(N).*PhaseSpace(jj);
+            Title=strcat('Phase (t=',num2str(dt(jj)),' period)');
+            WrapPhase=wrapToPi(PhaseEvol.*MaskX);
+            imagesc(x,y,WrapPhase,[-pi, pi]);
+        %     imagesc(x,y(1:N/2),WrapPhase(1:N/2,:),[-pi, pi]);
+        %     imagesc(x,y,rot90(WrapPhase,3),[-pi, pi]);
+            axis square; axis image; 
+            colormap(PhaseColormap); colorbar
+            xlabel('x (\mum)')
+            ylabel('y (\mum)')
+        %     daspect([1 1 1])
+            title(Title)
+        %     set(gca,'FontSize',fst);
+            drawnow
+            PhaseMovie1(jj)=getframe(gcf);
+            pause(0.01)
+
+        end
+    
+    % Phase (correction)
+
+    PhaseMovie2(Nframes)=struct('cdata',[],'colormap',[]);
+
+        F5=figure();
+        for jj=1:Nframes
+            PhaseEvol=PhaseCorrW+ones(N).*PhaseSpace(jj);
+            Title=strcat('Phase (t=',num2str(dt(jj)),' period)');
+            WrapPhase=wrapToPi(PhaseEvol.*MaskX);
+            imagesc(x,y,WrapPhase,[-pi, pi]);
+        %     imagesc(x,y(1:N/2),WrapPhase(1:N/2,:),[-pi, pi]);
+        %     imagesc(x,y,rot90(WrapPhase,3),[-pi, pi]);
+            axis square; axis image; 
+            colormap(PhaseColormap); colorbar
+            xlabel('x (\mum)')
+            ylabel('y (\mum)')
+        %     daspect([1 1 1])
+            title(Title)
+        %     set(gca,'FontSize',fst);
+            drawnow
+            PhaseMovie2(jj)=getframe(gcf);
+            pause(0.01)
+
+        end
 
     %% Histogram
 
