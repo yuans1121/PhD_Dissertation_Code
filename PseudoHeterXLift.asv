@@ -8,7 +8,7 @@ lambda=10.6;    %microns
 
 theta=60*pi/180;    % SNOM incidence angle
 
-Vrms=0.104;     % Volts
+Vrms=0.106;     % Volts
 
 %% LOAD
     
@@ -29,26 +29,20 @@ n=size(y);  n=n(1);
 TopoFwrd=MSB1(:,5,1);
 TopoBwrd=MSB1(:,6,1);
 
-z=TopoFwrd;
 
-p=polyfit(y,z,1);
-zfit=polyval(p,y);
+Y=zeros(1,6);
+Z=zeros(1,6);
 
-zp=z-zfit+z(n);
-
-% Y=zeros(1,6);
-% Z=zeros(1,6);
-
-% j=1;
-% for i=3:1:n-3
-%     if(TopoFwrd(i)<0.25)
-%         if(TopoFwrd(i)<TopoFwrd(i-2) && TopoFwrd(i)<TopoFwrd(i+2))
-%             Y(j)=y(i);
-%             Z(j)=TopoFwrd(i);
-%             j=j+1;
-%         end
-%     end
-% end
+j=1;
+for i=3:1:n-3
+    if(TopoFwrd(i)<0.25)
+        if(TopoFwrd(i)<TopoFwrd(i-2) && TopoFwrd(i)<TopoFwrd(i+2))
+            Y(j)=y(i);
+            Z(j)=TopoFwrd(i);
+            j=j+1;
+        end
+    end
+end
 
 % Y=Y-Y(1);
 % Z=Z-Z(1);
@@ -70,8 +64,6 @@ zp=z-zfit+z(n);
 % Mask(SubstInd)=0;
 
 % diff=mean(abs(TopoFwrdcorr-TopoBwrdcorr));
-
-angle=atan((z(1)-z(n))/y(n))*180/pi
 
 %% ANALYSIS
 
@@ -130,14 +122,14 @@ PhaseColormap=[rm gm bm];
 
 Fig1=figure('units','normalized','outerposition',[0 0 1 1]);
     subplot(1,2,1);
-    plot(y,TopoFwrd,y,TopoBwrd,y,zfit)
+    plot(y,TopoFwrdcorr,y,TopoBwrdcorr)
     title('Topography')
     axis square
     xlabel('x (\mum)')
     ylabel('z (\mum)');
 
     subplot(1,2,2);
-    plot(y,z,y,zp)
+    plot(y,Mask)
     title('Mask')
     axis square
     xlabel('x (\mum)')
@@ -146,12 +138,13 @@ Fig1=figure('units','normalized','outerposition',[0 0 1 1]);
 Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig21=subplot(2,1,1);
     imagesc(y,h,ModulTau)
-    title('Field Modulus |Ez|')
+    title('Field Modulus |Ez|/|Ez_{max}|')
     colormap(Fig1,parula)
     bar=colorbar;
     xlabel('x (\mum)')
-    ylabel('h (nm)');
+    ylabel('h (\mum)');
     set(gca,'Ydir','normal')
+%     daspect([1 60 60]);
     
     Fig22=subplot(2,1,2);
     imagesc(y,h,PhaseTauMask)
@@ -161,7 +154,9 @@ Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
     xlabel(bar,'(rad)')
     caxis([-pi pi])
     xlabel('x (\mum)')
-    ylabel('h (nm)')
+    ylabel('h (\mum)')
+    set(gca,'Ydir','normal')
+%     daspect([1 60 60]);
     pause(0.00001);
     frame_h = get(handle(gcf),'JavaFrame');
     set(frame_h,'Maximized',1);
@@ -169,14 +164,14 @@ Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
 Fig3=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig21=subplot(2,1,1);
     imagesc(y,h,ModulTau)
-    title('Field Modulus |Ez|')
+    title('Field Modulus |Ez|/|Ez_{max}|')
     colormap(Fig1,parula)
     xlabel('x (\mum)')
-    ylabel('h (nm)');
+    ylabel('h (\mum)');
     set(gca,'Ydir','normal')
     
     Fig22=subplot(2,1,2);
-    plot(y,TopoFwrd)
+    plot(y,TopoFwrdcorr)
     title('Topography')
     xlim([0 15])
     xlabel('x (\mum)')
@@ -192,11 +187,11 @@ Fig4=figure('units','normalized','outerposition',[0 0 1 1]);
     colormap(Fig21,PhaseColormap)
     caxis([-pi pi])
     xlabel('x (\mum)')
-    ylabel('h (nm)')
+    ylabel('h (\mum)')
     set(gca,'Ydir','normal')
     
     Fig22=subplot(2,1,2);
-    plot(y,TopoFwrd)
+    plot(y,TopoFwrdcorr)
     title('Topography')
     xlim([0 15])
     xlabel('x (\mum)')
@@ -205,6 +200,4 @@ Fig4=figure('units','normalized','outerposition',[0 0 1 1]);
     frame_h = get(handle(gcf),'JavaFrame');
     set(frame_h,'Maximized',1);
     
-saveas(Fig2,strcat(dir,'\','1.modulus_phase.png'));
-saveas(Fig3,strcat(dir,'\','2.modulus.png'));
-saveas(Fig4,strcat(dir,'\','3.phase.png'));
+% saveas(Fig2,strcat(dir,'\','LiftScan.png'))
