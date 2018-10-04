@@ -27,13 +27,13 @@ saveMATLABfig=0;    % saveMATLABfig=0 do not save figure in matlab format
                     
 %% LOAD
     
-load 2018-10-01_leaky_E4_PH_VLP_5
+load 2018-10-01_leaky_E4_PH_VLP_12
 
 dir1='Presentation';
 dir2='2018-10-01';
 % dir3='bowtie_1_LP_150_3';
 % dir3='discrete_bowtie_LP_150_3';
-dir3='Leaky_E4_VLP_5';
+dir3='Leaky_E4_VLP_12';
 % dir3='Leaky_E_4_V_RHCP_X_5\corr_subst';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
