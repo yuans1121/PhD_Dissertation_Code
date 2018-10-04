@@ -8,7 +8,7 @@ lambda=10.6;    %microns
 
 theta=60*pi/180;    % SNOM incidence angle
 
-Vrms=0.106;     % Volts
+Vrms=0.104;     % Volts
 
 % MaxTau=50.4179; % Good diodes: From 2017-11-21_diode_h_5_PH_X_3
 % MaxTau=26.2718; % Bad diodes diodes: From 2017-12-12_diode_g_2_PH_X_2
@@ -27,10 +27,10 @@ saveMATLABfig=0;    % saveMATLABfig=0 do not save figure in matlab format
                     
 %% LOAD
     
-load 2018-10-01_leaky_E4_PH_VLP_12
+load 2018-10-02_leaky_E4_PH_VLP_12
 
 dir1='Presentation';
-dir2='2018-10-01';
+dir2='2018-10-02';
 % dir3='bowtie_1_LP_150_3';
 % dir3='discrete_bowtie_LP_150_3';
 dir3='Leaky_E4_VLP_12';
