@@ -12,11 +12,11 @@ Vrms=0.104;     % Volts
 
 %% LOAD
     
-load 2018-10-01_lift_leaky_E4_PH_VLP_1
+load 2018-10-01_lift_leaky_E4_PH_VLP_3
 
 dir1='Presentation';
 dir2='2018-10-01';
-dir3='lift_leaky_E4_VLP_2';
+dir3='lift_leaky_E4_VLP_3';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
 dir=strcat(dir1,'\',dir4);
@@ -25,16 +25,17 @@ dir=strcat(dir1,'\',dir4);
 
 y=MSB1(:,2,1);
 n=size(y);  n=n(1);
+nh=size(h); nh=nh(1);
 
-TopoFwrd=MSB1(:,5,1);
-TopoBwrd=MSB1(:,6,1);
+TopoFwrd=flipud(MSB1(:,5,1));
+TopoBwrd=flipud(MSB1(:,6,1));
 
-z=TopoFwrd;
+z=TopoFwrd-min(TopoFwrd);
 
 p=polyfit(y,z,1);
 zfit=polyval(p,y);
 
-zp=z-zfit+z(n);
+zp=z-zfit+min(z);
 
 % Y=zeros(1,6);
 % Z=zeros(1,6);
@@ -85,6 +86,9 @@ for i=1:m
     SideB2(i,:)=MSB2(:,4,i)';
 end
 
+SideB1=flipud(SideB1);
+SideB2=flipud(SideB2);
+
 % Gamma calculation
 
 V=sqrt(2)*Vrms;
@@ -110,6 +114,14 @@ PhaseTau=atan2(-imag(Tau),real(Tau));
 % PhaseTauMask=PhaseTau.*Mask;
 PhaseTauMask=PhaseTau;
 
+Y=ones(nh,n);
+for ii=1:1:nh
+    Y(ii,:)=y; 
+end
+
+PhaseCorr=PhaseTau-(2*pi/lambda)*Y*sin(theta);
+PhaseCorrW=wrapToPi(PhaseCorr);
+
 % Phase color map (as used by Hillenbrand et al.)
 
 up=(1:89)'/90;
@@ -133,14 +145,14 @@ Fig1=figure('units','normalized','outerposition',[0 0 1 1]);
     plot(y,TopoFwrd,y,TopoBwrd,y,zfit)
     title('Topography')
     axis square
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('z (\mum)');
 
     subplot(1,2,2);
     plot(y,z,y,zp)
     title('Mask')
     axis square
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('z (\mum)');
         
 Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
@@ -149,19 +161,21 @@ Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
     title('Field Modulus |Ez|')
     colormap(Fig1,parula)
     bar=colorbar;
-    xlabel('x (\mum)')
+    xlabel(bar,'(V)')
+    xlabel('y (\mum)')
     ylabel('h (nm)');
     set(gca,'Ydir','normal')
     
     Fig22=subplot(2,1,2);
-    imagesc(y,h,PhaseTauMask)
+    imagesc(y,h,PhaseCorrW)
     title('Phase')
     colormap(Fig22,PhaseColormap)
     bar=colorbar;
     xlabel(bar,'(rad)')
     caxis([-pi pi])
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('h (nm)')
+    set(gca,'Ydir','normal')
     pause(0.00001);
     frame_h = get(handle(gcf),'JavaFrame');
     set(frame_h,'Maximized',1);
@@ -171,15 +185,15 @@ Fig3=figure('units','normalized','outerposition',[0 0 1 1]);
     imagesc(y,h,ModulTau)
     title('Field Modulus |Ez|')
     colormap(Fig1,parula)
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('h (nm)');
     set(gca,'Ydir','normal')
     
     Fig22=subplot(2,1,2);
-    plot(y,TopoFwrd)
+    plot(y,z)
     title('Topography')
     xlim([0 15])
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('z (\mum)');
     pause(0.00001);
     frame_h = get(handle(gcf),'JavaFrame');
@@ -187,19 +201,19 @@ Fig3=figure('units','normalized','outerposition',[0 0 1 1]);
     
 Fig4=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig21=subplot(2,1,1);
-    imagesc(y,h,PhaseTauMask)
+    imagesc(y,h,PhaseCorrW)
     title('Phase')
     colormap(Fig21,PhaseColormap)
     caxis([-pi pi])
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('h (nm)')
     set(gca,'Ydir','normal')
     
     Fig22=subplot(2,1,2);
-    plot(y,TopoFwrd)
+    plot(y,z)
     title('Topography')
     xlim([0 15])
-    xlabel('x (\mum)')
+    xlabel('y (\mum)')
     ylabel('z (\mum)');
     pause(0.00001);
     frame_h = get(handle(gcf),'JavaFrame');
