@@ -13,7 +13,7 @@ Vrms=0.104;     % Volts
 run=1;  % run=0 stops after topography
         % run=1 continues after topography
 
-savefigs=0; % savefigs=0 do not save images
+savefigs=1; % savefigs=0 do not save images
             % savefigs=1 save images
             
 savevid=0;  % savefigs=0 do not save video
@@ -102,7 +102,7 @@ end
 
 MaskX=MaskY;
 
-F1=figure();
+    F1=figure(); % Topographies for the X & Y scans and its masks.
 
     % X component
 
@@ -183,7 +183,9 @@ if run==1
     SideB2=sqrt(SideB2x.^2+SideB2y.^2);
     SideB2phase=MaskX.*atan2(SideB2y,SideB2x)*180/pi;
 
-    F2=figure();
+    
+        % Display the X and Y components for the SBs, and the calculated modulus
+        F2=figure();  
 
         % 1ST sideband
         % suptitle(strcat(dir3,' (Non Rotated)'))
@@ -305,8 +307,8 @@ if run==1
     PhaseCorrW=PhaseCorW(y,PhaseTau,lambda,theta);
     PhaseCorrWMask=PhaseCorrW.*MaskX; % Corrected phase
     
-        F3=figure('units','normalized','outerposition',[0 0 1 1]);
-        % suptitle('NEAR-FIELD (METHOD 1)')
+        % Near-field magnitude and phase, using the SBs modulus 
+        F3=figure();
         Fig1=subplot(1,2,1);
         imagesc(x,y,ModulTau)
         title('|Ez|')
@@ -342,6 +344,7 @@ if run==1
     PhaseCorrW=PhaseCorW(y,PhaseTau,lambda,theta);
     PhaseCorrWMask=PhaseCorrW.*MaskX; % Corrected phase
     
+        % Near-field magnitude and phase, using the SBs X component only
         F4=figure();
         Fig1=subplot(1,2,1);
         imagesc(x,y,ModulTau)
@@ -375,6 +378,7 @@ if run==1
 
     [X2,Y2,X2rot,Y2rot,X2subs,Y2subs,X2subsrot,Y2subsrot,MaxEigenVect2,MinEigenVect2,SideB2xrot,SideB2yrot]=Covariance(K,SideB2x,SideB2y);
 
+        % Scatter plots for the original SBs and rotated SBs
         F5=figure();
         subplot(2,2,1)
         scatter(X1subs,Y1subs,'.','b')
@@ -441,8 +445,9 @@ if run==1
 
     % 1ST sideband
 
-    F6=figure();
-    % suptitle('SIDEBANDS (METHOD 2)')
+        % Display the X and Y components for the rotated SBs, and the calculated modulus 
+        F6=figure();
+        % suptitle('SIDEBANDS (METHOD 2)')
         FigSB1xrot=subplot(2,3,1);
         imagesc(x,y,SideB1xrot)
         title('1st Sideband X')
@@ -486,7 +491,7 @@ if run==1
         % xlabel('x (\mum)')
         % ylabel('y (\mum)')
 
-    % 2ND sideband
+        % 2ND sideband
 
         FigSB2xrot=subplot(2,3,4);
         imagesc(x,y,SideB2xrot)
@@ -543,7 +548,8 @@ if run==1
     PhaseTaurotMask=PhaseTaurot.*MaskX;   % Raw Phase
     PhaserotCorrW=PhaseCorW(y,PhaseTaurot,lambda,theta);
     PhaserotCorrWMask=PhaserotCorrW.*MaskX; % Corrected phase
-
+    
+        % Near-field magnitude and phase, using the rotated SBs X component only
         F7=figure();
         % suptitle('NEAR-FIELD METHOD 2')
         Fig1=subplot(1,2,1);
@@ -575,6 +581,8 @@ if run==1
 
     [X1,Y1,X1rot,Y1rot,X1subs,Y1subs,X1subsrot,Y1subsrot,MaxEigenVect1,MinEigenVect1,SideB1xrotNF,SideB1yrotNF]=Covariance(K,C2*SideB2x,-C1*SideB1x);
 
+        % Near-field magnitude in the complex plane as a scatter plot.
+        % Calculation was done using the original SBs x components
         FTau1=figure();
         scatter(X1subs,Y1subs,'.','b')
         hold on
@@ -595,6 +603,8 @@ if run==1
 
     [X1,Y1,X1rot,Y1rot,X1subs,Y1subs,X1subsrot,Y1subsrot,MaxEigenVect1,MinEigenVect1,SideB1xrotNF,SideB1yrotNF]=Covariance(K,C2*SideB2xrot,-C1*SideB1xrot);
 
+        % Near-field magnitude in the complex plane as a scatter plot.
+        % Calculation was done using the rotated SBs x components
         FTau2=figure('units','normalized','outerposition',[0 0 1 1]);
         scatter(X1subs,Y1subs,'.','b')
         hold on
@@ -610,4 +620,15 @@ if run==1
         pause(0.00001);
         frame_h = get(handle(gcf),'JavaFrame');
         set(frame_h,'Maximized',1);
+        
+    %% Save Figures
+    if savefigs==1
+        saveas(F1,strcat(dir,'\','1.Topography.png'))
+        saveas(F2,strcat(dir,'\','2.SideBands.png'))
+        saveas(F3,strcat(dir,'\','3.Ez_and_Phase-using_modulus.png'))
+        saveas(F4,strcat(dir,'\','4.Ez_and_Phase-using_xcomp.png'))
+        saveas(F5,strcat(dir,'\','5.SideBands_scatterplot.png'))
+        saveas(F6,strcat(dir,'\','6.RotatedSideBands.png'))
+        saveas(F7,strcat(dir,'\','7.Ez_and_Phase-using_rotSBs.png'))
+    end
 end
