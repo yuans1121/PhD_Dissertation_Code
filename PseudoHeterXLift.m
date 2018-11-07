@@ -14,7 +14,7 @@ Vrms=0.104;     % Volts
     
 load 2018-10-01_lift_leaky_E4_PH_VLP_3
 
-dir1='Presentation';
+dir1='Analysis';
 dir2='2018-10-01';
 dir3='lift_leaky_E4_VLP_3';
 dir4=strcat(dir2,'\',dir3);
@@ -157,7 +157,7 @@ Fig1=figure('units','normalized','outerposition',[0 0 1 1]);
         
 Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig21=subplot(2,1,1);
-    imagesc(y,h,ModulTau)
+    imagesc(y,h,flipud(ModulTau))
     title('Field Modulus |Ez|')
     colormap(Fig1,parula)
     bar=colorbar;
@@ -167,7 +167,7 @@ Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
     set(gca,'Ydir','normal')
     
     Fig22=subplot(2,1,2);
-    imagesc(y,h,PhaseCorrW)
+    imagesc(y,h,flipud(PhaseCorrW))
     title('Phase')
     colormap(Fig22,PhaseColormap)
     bar=colorbar;
@@ -182,7 +182,7 @@ Fig2=figure('units','normalized','outerposition',[0 0 1 1]);
     
 Fig3=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig21=subplot(2,1,1);
-    imagesc(y,h,ModulTau)
+    imagesc(y,h,flipud(ModulTau))
     title('Field Modulus |Ez|')
     colormap(Fig1,parula)
     xlabel('y (\mum)')
@@ -201,7 +201,7 @@ Fig3=figure('units','normalized','outerposition',[0 0 1 1]);
     
 Fig4=figure('units','normalized','outerposition',[0 0 1 1]);
     Fig21=subplot(2,1,1);
-    imagesc(y,h,PhaseCorrW)
+    imagesc(y,h,flipud(PhaseCorrW))
     title('Phase')
     colormap(Fig21,PhaseColormap)
     caxis([-pi pi])
@@ -219,6 +219,6 @@ Fig4=figure('units','normalized','outerposition',[0 0 1 1]);
     frame_h = get(handle(gcf),'JavaFrame');
     set(frame_h,'Maximized',1);
     
-saveas(Fig2,strcat(dir,'\','1.modulus_phase.png'));
-saveas(Fig3,strcat(dir,'\','2.modulus.png'));
-saveas(Fig4,strcat(dir,'\','3.phase.png'));
+% saveas(Fig2,strcat(dir,'\','1.modulus_phase.png'));
+% saveas(Fig3,strcat(dir,'\','2.modulus.png'));
+% saveas(Fig4,strcat(dir,'\','3.phase.png'));

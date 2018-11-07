@@ -16,10 +16,10 @@ Vrms=0.104;     % Volts
 run=1;  % run=0 stops after topography
         % run=1 continues after topography
 
-savefigs=1; % savefigs=0 do not save images
+savefigs=0; % savefigs=0 do not save images
             % savefigs=1 save images
             
-savevid=1;  % savefigs=0 do not save video
+savevid=0;  % savefigs=0 do not save video
             % savefigs=1 save video
         
 saveMATLABfig=0;    % saveMATLABfig=0 do not save figure in matlab format
@@ -27,14 +27,11 @@ saveMATLABfig=0;    % saveMATLABfig=0 do not save figure in matlab format
                     
 %% LOAD
     
-load 2018-10-02_leaky_E4_PH_VLP_12
+load 2018-10-19_sample_g_diode_12_PH_5
 
-dir1='Presentation';
-dir2='2018-10-02';
-% dir3='bowtie_1_LP_150_3';
-% dir3='discrete_bowtie_LP_150_3';
-dir3='Leaky_E4_VLP_12';
-% dir3='Leaky_E_4_V_RHCP_X_5\corr_subst';
+dir1='Analysis';
+dir2='2018-10-19';
+dir3='sample_g_diode_12_5';
 dir4=strcat(dir2,'\',dir3);
 mkdir(dir1,dir4);
 dir=strcat(dir1,'\',dir4);
@@ -58,9 +55,7 @@ MaxTopo=max(max(TopoX));
 thrX=0.30*(MaxTopo-MinTopo)+MinTopo;
 
 StrucInd=find(TopoX>thrX);
-SubstInd=find(TopoX<thrX);
-
-% [MaskX,Kx]=Mask(TopoX,thrX); 
+SubstInd=find(TopoX<thrX); 
 
 MaskX=zeros(N,N);
 MaskX(StrucInd)=1;
@@ -144,13 +139,21 @@ if run==1
 
     % 2ND sideband
     SideB2=SideB2x;
-
+    
+    % Fix weird peaks on the scan that eclipse data.
+%     for ii=8:1:22
+%         SideB1(106,ii)=0.5*(SideB1(105,ii)+SideB1(107,ii));
+%     end
+%     for ii=28:1:30
+%         SideB2(6,ii)=0.5*(SideB2(5,ii)+SideB2(7,ii));
+%     end
+    
     F2=figure('units','normalized','outerposition',[0 0 1 1]);
     % suptitle(strcat(dir3,' (Non Rotated)'))
     % suptitle('SIDEBANDS (METHOD 1)')
 
         FigSB1=subplot(1,2,1);
-        imagesc(x,y,SideB1)
+        imagesc(SideB1)
         % imagesc(x,y(1:N/2),SideB1(1:N/2,:))
         % imagesc(x,y,rot90(SideB1,3))
         title('1st Sideband')
@@ -165,7 +168,7 @@ if run==1
         % 2ND sideband
 
         FigSB2=subplot(1,2,2);
-        imagesc(x,y,SideB2)
+        imagesc(SideB2)
         % imagesc(x,y(1:N/2),SideB2(1:N/2,:))
         % imagesc(x,y,rot90(SideB2,3))
         title('2nd Sideband')
@@ -180,6 +183,62 @@ if run==1
         frame_h = get(handle(gcf),'JavaFrame');
         set(frame_h,'Maximized',1);
 
+    % ---- Noise removal for sideband ----
+    
+%     minSideB2=abs(min(min(SideB2)));
+    SideB2p=SideB2;
+%     SideB2p=SideB2+minSideB2;
+%     maxSideB2p=max(max(SideB2p));
+%     SideB2p=SideB2p/maxSideB2p;
+    AvFilter=fspecial('average',3);
+    SB2av=filter2(AvFilter,SideB2p);     % apply average filter
+    SB2med=medfilt2(SideB2p,[3 3]);            % apply median filter
+%     
+%     SB2av=SB2av-abs(min(min(SB2av)));
+%     SB2av=maxSideB2p*(SB2av/max(max(SB2av)));
+%     SB2med=maxSideB2p*(SB2med/max(max(SB2med)));
+%     
+%     SB2av=SB2av-minSideB2;
+%     SB2med=SB2med-minSideB2;
+    
+%     SideB2=SB2av;
+    % ------------------------------------
+
+        F21=figure('units','normalized','outerposition',[0 0 1 1]);
+    % suptitle(strcat(dir3,' (Non Rotated)'))
+    % suptitle('SIDEBANDS (METHOD 1)')
+
+        FigSB1=subplot(1,2,1);
+        imagesc(SB2av)
+        % imagesc(x,y(1:N/2),SideB1(1:N/2,:))
+        % imagesc(x,y,rot90(SideB1,3))
+        title('1st Sideband')
+        colormap(FigSB1,hot)
+        bar=colorbar;
+        xlabel(bar,'(V)')
+        axis square
+        xlabel('x (\mum)')
+        ylabel('y (\mum)')
+        daspect([1 1 1])
+
+        % 2ND sideband
+
+        FigSB2=subplot(1,2,2);
+        imagesc(SB2med)
+        % imagesc(x,y(1:N/2),SideB2(1:N/2,:))
+        % imagesc(x,y,rot90(SideB2,3))
+        title('2nd Sideband')
+        colormap(FigSB2,hot)
+        bar=colorbar;
+        xlabel(bar,'(V)')
+        axis square
+        xlabel('x (\mum)')
+        ylabel('y (\mum)')
+        daspect([1 1 1])
+        pause(0.00001);
+        frame_h = get(handle(gcf),'JavaFrame');
+        set(frame_h,'Maximized',1);
+    
     %% NEAR FIELD
 
     % Gamma calculation
@@ -197,6 +256,8 @@ if run==1
 
     Vrms=(2.63*lambda/(4*pi))*scale/(sqrt(2));
 
+    % E-field
+    
     Tau=C2*SideB2-1i*C1*SideB1;
     MaxTau=max(max(abs(Tau)));
     ModulTau=abs(Tau);
@@ -204,22 +265,13 @@ if run==1
     % MaxTau=max(max(ModulTau))
     % ModulTau(ModulTau>60)=0;
     PhaseTau=atan2(-imag(Tau),real(Tau));
-
-    Y=ones(My,Mx);
-    for ii=1:1:Mx
-       Y(:,ii)=y; 
-    end
-    Y=flipud(Y);
-    
-    PhaseCorr=PhaseTau-(2*pi/lambda)*Y*sin(theta);
-    PhaseCorrW=wrapToPi(PhaseCorr);
-
-    PhaseTauMask=PhaseTau.*MaskX;
-    PhaseCorrWMask=PhaseCorrW.*MaskX;
+    PhaseTauMask=PhaseTau.*MaskX;   % Raw Phase
+    PhaseCorrW=PhaseCorW(y,PhaseTau,lambda,theta);
+    PhaseCorrWMask=PhaseCorrW.*MaskX; % Corrected phase
     
         % Plot 1: Ez vs E Phase
 
-        F31=figure('units','normalized','outerposition',[0 0 1 1]);
+        F31=figure();
         Fig1=subplot(1,2,1);
         imagesc(x,y,ModulTau)
         title('|Ez|')
@@ -227,7 +279,7 @@ if run==1
         bar=colorbar;
         % caxis([0 1])
         xlabel(bar,'(V)')
-        axis square
+%         axis square
         xlabel('x (\mum)')
         ylabel('y (\mum)');
         daspect([1 1 1])
@@ -238,7 +290,7 @@ if run==1
         colormap(Fig2,PhaseColormap)
         bar=colorbar;
         xlabel(bar,'(rad)')
-        axis square
+%         axis square
         caxis([-pi pi])
         xlabel('x (\mum)')
         ylabel('y (\mum)')
@@ -257,9 +309,11 @@ if run==1
         title('|Ez|')
         colormap(Fig1,parula)
         bar=colorbar;
+        xlabel(bar,'(V)')
         axis square
         xlabel('x (\mum)')
         ylabel('y (\mum)');
+%         set(gca,'Ydir','normal')
         daspect([1 1 1])
 
         Fig2=subplot(1,2,2);
@@ -272,6 +326,7 @@ if run==1
         caxis([-pi pi])
         xlabel('x (\mum)')
         ylabel('y (\mum)')
+%         set(gca,'Ydir','normal')
         daspect([1 1 1])
         pause(0.00001);
         frame_h = get(handle(gcf),'JavaFrame');
